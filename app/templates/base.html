@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}ShopLite{% endblock %} · ShopLite</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="{{ url_for('dashboard') }}">ShopLite</a>
+  <nav>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('order_list') }}">Orders</a>
+    <a href="{{ url_for('order_new') }}">New order</a>
+    <a href="{{ url_for('customer_list') }}">Customers</a>
+    <a href="{{ url_for('product_list') }}">Products</a>
+  </nav>
+</header>
+
+<div class="infra">
+  <span class="pill {{ 'pg' if runtime.engine == 'PostgreSQL' else 'my' }}">DB: {{ runtime.engine }} @ {{ runtime.db_host }}</span>
+  <span class="pill">Web: {{ runtime.hostname }}{% if runtime.instance_id %} ({{ runtime.instance_id }}){% endif %}</span>
+  {% if runtime.db_read_only is none %}
+    <span class="pill bad">DB unreachable</span>
+  {% elif runtime.db_read_only %}
+    <span class="pill warn">DB READ-ONLY</span>
+  {% else %}
+    <span class="pill ok">DB read/write</span>
+  {% endif %}
+  {% if runtime.app_read_only %}<span class="pill warn">APP MAINTENANCE MODE</span>{% endif %}
+</div>
+
+{% if runtime.db_read_only or runtime.app_read_only %}
+<div class="banner">Migration in progress: the store is temporarily read-only. Browsing works, changes are disabled.</div>
+{% endif %}
+
+<main>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

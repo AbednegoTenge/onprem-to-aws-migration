@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Customers{% endblock %}
+{% block content %}
+<h1>Customers</h1>
+
+<details class="form">
+  <summary>Add customer</summary>
+  <form method="post" action="{{ url_for('customer_create') }}">
+    <label>Full name <input name="full_name" required maxlength="150"></label>
+    <label>Email <input name="email" type="email" required maxlength="255"></label>
+    <label>City <input name="city" maxlength="100"></label>
+    <button>Create</button>
+  </form>
+</details>
+
+<form class="search" method="get"><input name="q" value="{{ q }}" placeholder="Search name, email or city"><button>Search</button></form>
+
+<table>
+  <tr><th>#</th><th>Name</th><th>Email</th><th>City</th><th>Created (UTC)</th></tr>
+  {% for c in rows %}
+  <tr><td>{{ c.id }}</td><td>{{ c.full_name }}</td><td>{{ c.email }}</td><td>{{ c.city or "" }}</td><td>{{ c.created_at }}</td></tr>
+  {% endfor %}
+</table>
+{% with extra={'q': q} %}{% include "_pager.html" %}{% endwith %}
+{% endblock %}

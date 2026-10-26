@@ -1,0 +1,5 @@
+<div class="pager">
+  {% if page > 1 %}<a href="{{ url_for(request.endpoint, page=page-1, **extra) }}">&larr; Prev</a>{% endif %}
+  <span>Page {{ page }}</span>
+  {% if rows|length == page_size %}<a href="{{ url_for(request.endpoint, page=page+1, **extra) }}">Next &rarr;</a>{% endif %}
+</div>

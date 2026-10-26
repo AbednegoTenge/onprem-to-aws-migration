@@ -1,0 +1,15 @@
+# Installed as /etc/mysql/mysql.conf.d/zz-migration.cnf by setup_db_server.sh
+# These are the source-side prerequisites for AWS DMS ongoing replication (CDC).
+[mysqld]
+# Listen on all interfaces so DMS / SCT / the web server can reach it.
+bind-address              = 0.0.0.0
+
+# Binary logging in row format with full row images (required by DMS CDC).
+server-id                 = 1
+log_bin                   = /var/log/mysql/mysql-bin.log
+binlog_format             = ROW
+binlog_row_image          = FULL
+binlog_checksum           = NONE
+
+# Keep binlogs long enough that a paused DMS task can resume (24h).
+binlog_expire_logs_seconds = 86400

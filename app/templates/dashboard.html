@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+
+<section class="cards">
+  <div class="card"><div class="k">Customers</div><div class="v">{{ "{:,}".format(counts.customers) }}</div></div>
+  <div class="card"><div class="k">Products</div><div class="v">{{ "{:,}".format(counts.products) }}</div></div>
+  <div class="card"><div class="k">Orders</div><div class="v">{{ "{:,}".format(counts.orders) }}</div></div>
+  <div class="card"><div class="k">Order items</div><div class="v">{{ "{:,}".format(counts.order_items) }}</div></div>
+  <div class="card"><div class="k">Revenue</div><div class="v">${{ "{:,.2f}".format(revenue) }}</div></div>
+  <div class="card"><div class="k">Heartbeats</div><div class="v">{{ "{:,}".format(counts.heartbeat) }}</div>
+    {% if last_hb %}<div class="sub">last {{ last_hb.written_at.strftime('%H:%M:%S') }} UTC from {{ last_hb.source_host }}</div>{% endif %}</div>
+</section>
+
+<div class="grid2">
+  <section>
+    <h2>Orders by status</h2>
+    <table>
+      {% for s in statuses %}
+      <tr><td><a href="{{ url_for('order_list', status=s) }}"><span class="st {{ s }}">{{ s }}</span></a></td>
+          <td class="num">{{ "{:,}".format(by_status.get(s, 0)) }}</td></tr>
+      {% endfor %}
+    </table>
+  </section>
+  <section>
+    <h2>Top customers <small>(view v_customer_revenue)</small></h2>
+    {% if view_error %}
+      <div class="flash error">View query failed: {{ view_error }}</div>
+    {% else %}
+    <table>
+      <tr><th>Customer</th><th>City</th><th class="num">Orders</th><th class="num">Revenue</th></tr>
+      {% for c in top_customers %}
+      <tr><td>{{ c.full_name }}</td><td>{{ c.city or "" }}</td><td class="num">{{ c.order_count }}</td>
+          <td class="num">${{ "{:,.2f}".format(c.revenue) }}</td></tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+  </section>
+</div>
+
+<h2>Latest orders</h2>
+<table>
+  <tr><th>#</th><th>Customer</th><th>Status</th><th class="num">Total</th><th>Created (UTC)</th></tr>
+  {% for o in recent %}
+  <tr><td><a href="{{ url_for('order_detail', oid=o.id) }}">{{ o.id }}</a></td><td>{{ o.full_name }}</td>
+      <td><span class="st {{ o.status }}">{{ o.status }}</span></td>
+      <td class="num">${{ "{:,.2f}".format(o.total) }}</td><td>{{ o.created_at }}</td></tr>
+  {% else %}
+  <tr><td colspan="5" class="muted">No orders yet. Run tools/seed.py.</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

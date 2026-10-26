@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Order #{{ order.id }}{% endblock %}
+{% block content %}
+<h1>Order #{{ order.id }} <span class="st {{ order.status }}">{{ order.status }}</span></h1>
+<p>{{ order.full_name }} &lt;{{ order.email }}&gt; · created {{ order.created_at }} UTC · updated {{ order.updated_at }} UTC</p>
+
+<table>
+  <tr><th>SKU</th><th>Product</th><th class="num">Qty</th><th class="num">Unit price</th><th class="num">Line total</th></tr>
+  {% for i in items %}
+  <tr><td><code>{{ i.sku }}</code></td><td>{{ i.name }}</td><td class="num">{{ i.quantity }}</td>
+      <td class="num">${{ "{:,.2f}".format(i.unit_price) }}</td>
+      <td class="num">${{ "{:,.2f}".format(i.unit_price * i.quantity) }}</td></tr>
+  {% endfor %}
+  <tr class="total"><td colspan="4">Total</td><td class="num">${{ "{:,.2f}".format(order.total) }}</td></tr>
+</table>
+
+<form method="post" action="{{ url_for('order_set_status', oid=order.id) }}" class="inline">
+  <label>Change status
+    <select name="status">{% for s in statuses %}<option {{ 'selected' if s == order.status }}>{{ s }}</option>{% endfor %}</select>
+  </label>
+  <button>Update</button>
+</form>
+{% endblock %}

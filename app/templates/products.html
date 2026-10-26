@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<h1>Products</h1>
+
+<details class="form">
+  <summary>Add product</summary>
+  <form method="post" action="{{ url_for('product_create') }}">
+    <label>SKU <input name="sku" required maxlength="40"></label>
+    <label>Name <input name="name" required maxlength="200"></label>
+    <label>Price <input name="price" type="number" step="0.01" min="0" required></label>
+    <label>Stock <input name="stock" type="number" min="0" value="100"></label>
+    <label class="wide">Description <textarea name="description" rows="2"></textarea></label>
+    <button>Create</button>
+  </form>
+</details>
+
+<form class="search" method="get"><input name="q" value="{{ q }}" placeholder="Search name or SKU"><button>Search</button></form>
+
+<table>
+  <tr><th>#</th><th>SKU</th><th>Name</th><th class="num">Price</th><th class="num">Stock</th><th>Updated (UTC)</th><th></th></tr>
+  {% for p in rows %}
+  <tr><td>{{ p.id }}</td><td><code>{{ p.sku }}</code></td><td>{{ p.name }}</td>
+      <td class="num">${{ "{:,.2f}".format(p.price) }}</td>
+      <td class="num {{ 'low' if p.stock < 10 }}">{{ p.stock }}</td><td>{{ p.updated_at }}</td>
+      <td><form method="post" action="{{ url_for('product_restock', pid=p.id) }}" class="inline">
+          <input type="hidden" name="qty" value="25"><button class="small">+25</button></form></td></tr>
+  {% endfor %}
+</table>
+{% with extra={'q': q} %}{% include "_pager.html" %}{% endwith %}
+{% endblock %}

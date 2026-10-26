@@ -1,0 +1,16 @@
+[Unit]
+Description=ShopLite web app (gunicorn)
+After=network-online.target mysql.service
+Wants=network-online.target
+
+[Service]
+User=shopapp
+Group=shopapp
+WorkingDirectory=/opt/shopapp/app
+EnvironmentFile=/etc/shopapp.env
+ExecStart=/opt/shopapp/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 --access-logfile - app:app
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
